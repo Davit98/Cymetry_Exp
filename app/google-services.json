@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "121981930538",
+    "firebase_url": "https://cymetry-exp.firebaseio.com",
+    "project_id": "cymetry-exp",
+    "storage_bucket": "cymetry-exp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:121981930538:android:670aae822996152d",
+        "android_client_info": {
+          "package_name": "com.davitmartirosyan.exp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "121981930538-prbko808n2fkccvuelc7dnu97l2c9ufh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.davitmartirosyan.exp",
+            "certificate_hash": "61d69957d105f8daa0c9b6b2a30c66ccde1fb163"
+          }
+        },
+        {
+          "client_id": "121981930538-v87kk3pil09flk5bv4asrjfnl94tvr0u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnEeHmQV3t18VhljrnvuHEkLgxCufob60"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "121981930538-v87kk3pil09flk5bv4asrjfnl94tvr0u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
