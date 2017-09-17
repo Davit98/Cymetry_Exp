@@ -24,13 +24,22 @@ import com.bumptech.glide.Glide;
 import com.davitmartirosyan.exp.R;
 import com.davitmartirosyan.exp.util.AppUtil;
 import com.davitmartirosyan.exp.util.Constant;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+
+import static android.util.Log.d;
 
 public class Activity2 extends AppCompatActivity implements View.OnClickListener {
 
@@ -38,12 +47,11 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
     private static final int REQUEST_CODE = 0;
     private static final int REQUEST_PICK_IMAGE = 2;
 
-    private static int counter = 10;
-
     private ImageView mphoto;
     private ImageButton takePhoto;
     private Button upload;
     private Button fromGallery;
+    private Button logOut;
 
     private ProgressDialog progressDialog;
 
@@ -55,12 +63,27 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
 
     private StorageReference mStorageRef;
 
+    private FirebaseAuth mAuth;
+    private GoogleApiClient mGoogleApiClient;
+
+    /***********************************************
+    private Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl(Constant.API.URL_GET)
+            .client(new OkHttpClient.Builder().build())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+    private APIService service = retrofit.create(APIService.class);
+    *****************************************************************/
+
+    private Uri uriSavedImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_2);
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
 
         progressDialog = new ProgressDialog(this);
 
@@ -68,6 +91,7 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
         mphoto = (ImageView) findViewById(R.id.activity_2_photo_iv);
         upload = (Button)findViewById(R.id.activity_2_upload_btn);
         fromGallery = (Button)findViewById(R.id.activity_2_take_from_gallery_btn);
+        logOut = (Button)findViewById(R.id.activity_2_log_out_btn);
 
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
             takePhoto.setEnabled(false);
@@ -75,18 +99,36 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
 
         }
 
+        //-------------------------------------------------------------------------------------------------------------
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Toast.makeText(Activity2.this,"onConnectionFailed:" + connectionResult,Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        //-------------------------------------------------------------------------------------------------------------
+
         takePhoto.setOnClickListener(this);
         upload.setOnClickListener(this);
         fromGallery.setOnClickListener(this);
+        logOut.setOnClickListener(this);
 
     }
+
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-
             case R.id.activity_2_imagebtn_ib:
-                String fileName = "photo" + counter + ".jpg";
+                String fileName = "photo.jpg";
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.TITLE, fileName);
                 mCapturedImageURI = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
@@ -115,6 +157,20 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
                     Toast.makeText(this,"Please take a picture",Toast.LENGTH_SHORT).show();
                 }
                 break;
+
+            case R.id.activity_2_log_out_btn:
+                // Firebase sign out
+                mAuth.signOut();
+
+                // Google sign-out
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                        new ResultCallback<Status>() {
+                            @Override
+                            public void onResult(@NonNull Status status) {
+                                startActivity(new Intent(Activity2.this,MainActivity.class));
+                            }
+                        });
+                break;
         }
     }
 
@@ -131,12 +187,10 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
                 case REQUEST_PICK_IMAGE:
                     Uri mTakeImageGalleryURI = data.getData();
                     mImageGalleryPath = getPath(mTakeImageGalleryURI);
-                    Log.d("testt",mImageGalleryPath);
                     Glide.with(this).load(mImageGalleryPath).into(mphoto);
                     break;
             }
         }
-
     }
 
     @Override
@@ -150,15 +204,15 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
     }
 
     public String getPath(Uri uri) {
-        if( uri == null ) {
-            Log.d("testt","Something went wrong!");
+        if(uri == null) {
+            Toast.makeText(Activity2.this,"Something went wrong",Toast.LENGTH_SHORT).show();
             return null;
         }
         int column_index_data;
         String path = null;
         String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-        if( cursor.moveToFirst() && !cursor.isClosed() ){
+        if (cursor.moveToFirst() && !cursor.isClosed()){
             column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             path = cursor.getString(column_index_data);
             cursor.close();
@@ -167,7 +221,7 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
         return path;
     }
 
-    public void imageUpload(String path) {
+    public void imageUpload(final String path) {
         progressDialog.setMessage("Uploading...");
         progressDialog.show();
         Uri file = Uri.fromFile(new File(path));
@@ -178,8 +232,8 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
             downloadUrl = taskSnapshot.getDownloadUrl();
             mphoto.setImageResource(android.R.color.transparent);
             progressDialog.dismiss();
-            Log.d("testt", downloadUrl.toString());
-            Toast.makeText(Activity2.this, "Upload Successful! :)", Toast.LENGTH_SHORT).show();
+            d("testt", downloadUrl.toString());
+            Toast.makeText(Activity2.this, "Upload Successfull! :)", Toast.LENGTH_SHORT).show();
             AppUtil.sendNotification(
                     getApplicationContext(),
                     Activity2.class,
@@ -187,6 +241,23 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
                     "You have successfuly submited a photo",
                     "",
                     Constant.NotifType.SUBMIT);
+
+            /**********************************************************
+            service.sendImage(
+                    GeneratePhotoID.getUniqueId(),
+                    Preference.getInstance(Activity2.this).getUserID(),
+                    downloadUrl.toString()).enqueue(new Callback<StatusDTO>() {
+                @Override
+                public void onResponse(Call<StatusDTO> call, Response<StatusDTO> response) {
+                    Log.d("User", Boolean.toString(response.body().isStatus()));
+                }
+
+                @Override
+                public void onFailure(Call<StatusDTO> call, Throwable t) {
+                    Log.e("err", t.toString());
+                }
+            });
+             ******************************************************************************/
             }
         }).addOnFailureListener(new OnFailureListener() {
         @Override
@@ -196,4 +267,5 @@ public class Activity2 extends AppCompatActivity implements View.OnClickListener
             }
         });
     }
+
 }

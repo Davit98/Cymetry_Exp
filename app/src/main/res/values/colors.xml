@@ -4,7 +4,11 @@
     <color name="colorPrimaryDark">#455A64</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="background_colour">#FFCDD2</color>
+    <color name="background_colour">#FFFFFF</color>
     <color name="text_colour">#000000</color>
     <color name="hint_colour">#BDBDBD</color>
+
+
+    <color name="grey_100">#F5F5F5</color>
+    <color name="grey_300">#E0E0E0</color>
 </resources>

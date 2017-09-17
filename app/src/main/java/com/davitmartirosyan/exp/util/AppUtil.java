@@ -29,6 +29,7 @@ public class AppUtil {
         }
     }
 
+
     public static void sendNotification(Context context, Class cls,
                                         String title, String description, String data, int type) {
 

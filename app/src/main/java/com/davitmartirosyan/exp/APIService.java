@@ -1,5 +1,6 @@
 package com.davitmartirosyan.exp;
 
+import com.davitmartirosyan.exp.pojo.StatusDTO;
 import com.davitmartirosyan.exp.pojo.UserDTO;
 import com.davitmartirosyan.exp.pojo.UserResponseDTO;
 
@@ -16,4 +17,7 @@ public interface APIService {
 
     @GET("/addUser")
     Call<UserResponseDTO> getUser(@Query("name") String name, @Query("lastName") String lastName, @Query("email") String email);
+
+    @GET("/sendImage")
+    Call<StatusDTO> sendImage(@Query("imageId") String imageId, @Query("userId") Long userId, @Query("path") String path);
 }

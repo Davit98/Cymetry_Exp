@@ -6,28 +6,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionBarSize">50dp</item>
     </style>
 
-    <style name="TestStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">35dp</item>
-        <item name="android:textColorHint">@color/hint_colour</item>
-        <item name="android:inputType">textPassword</item>
-        <item name="android:maxLength">20</item>
-        <item name="android:maxLines">1</item>
-        <item name="android:textSize">18sp</item>
-        <item name="android:textColor">@color/text_colour</item>
-    </style>
-
-    <style name="RegistrationEdittextStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">15dp</item>
-        <item name="android:maxLength">20</item>
-        <item name="android:textColorHint">@color/hint_colour</item>
-        <item name="android:maxLines">1</item>
-        <item name="android:textSize">18sp</item>
+    <!-- Splash Screen theme. -->
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 
 </resources>

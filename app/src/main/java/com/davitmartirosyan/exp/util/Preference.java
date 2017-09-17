@@ -13,7 +13,6 @@ public class Preference {
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
 
-
     private Preference(Context context) {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         mEditor = mSharedPreferences.edit();
@@ -31,8 +30,11 @@ public class Preference {
         mEditor.apply();
     }
 
-    public long getUserMail() {
+    public long getUserID() {
         return mSharedPreferences.getLong(PREF_USER_ID, 0);
     }
 
+    public SharedPreferences.Editor getEditor() {
+        return mEditor;
+    }
 }
